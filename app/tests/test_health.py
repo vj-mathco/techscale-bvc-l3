@@ -1,6 +1,7 @@
 # TechScale: Test suite
 
 from fastapi.testclient import TestClient
+import logging
 import sys
 import os
 
@@ -15,6 +16,14 @@ client = TestClient(app)
 def test_health_returns_200():
     response = client.get("/health")
     assert response.status_code == 200
+
+
+def test_health_check_logs_request(caplog):
+    with caplog.at_level(logging.INFO, logger="main"):
+        response = client.get("/health")
+
+    assert response.status_code == 200
+    assert "Health check requested" in caplog.text
 
 
 # TODO: Check that the health endpoint returns a body with the expected fields.
